@@ -4,4 +4,16 @@ export class Usuario {
     public nombre: string,
     public email: string
   ) {}
+
+  static formFirebase({
+    email,
+    nombre,
+    uid,
+  }: {
+    email: string;
+    nombre: string;
+    uid: string;
+  }) {
+    return new Usuario(uid, nombre, email);
+  }
 }
