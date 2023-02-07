@@ -6,18 +6,24 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Store } from '@ngrx/store';
 import { AppState } from '../app.reducer';
 import { UnSetUser, setUser } from '../auth/auth.action';
+import { unSetItems } from '../ingreso-egreso/ingreso-egreso.actions';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   unSubscrition!: Subscription;
+  private _user!: Usuario | null;
 
   constructor(
     private auth: AngularFireAuth,
     private firebase: AngularFirestore,
     private store: Store<AppState>
   ) {}
+
+  get user() {
+    return this._user;
+  }
 
   initAuthListener() {
     this.auth.authState.subscribe((fuser) => {
@@ -28,14 +34,16 @@ export class AuthService {
           .doc(`${fuser.uid}/usuario`)
           .valueChanges()
           .subscribe((firestoreUser: any) => {
-            console.log(firestoreUser);
             const user = Usuario.formFirebase(firestoreUser);
+            this._user = user;
             this.store.dispatch(setUser({ user }));
           });
       } else {
         console.log('no existe');
+        this._user = null;
         this.unSubscrition.unsubscribe();
         this.store.dispatch(UnSetUser());
+        this.store.dispatch(unSetItems());
       }
     });
   }
