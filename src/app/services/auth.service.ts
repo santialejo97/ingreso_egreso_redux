@@ -27,9 +27,7 @@ export class AuthService {
 
   initAuthListener() {
     this.auth.authState.subscribe((fuser) => {
-      console.log('esta en estado', fuser?.uid);
       if (fuser) {
-        console.log('existe', fuser?.uid);
         this.unSubscrition = this.firebase
           .doc(`${fuser.uid}/usuario`)
           .valueChanges()
@@ -39,9 +37,11 @@ export class AuthService {
             this.store.dispatch(setUser({ user }));
           });
       } else {
-        console.log('no existe');
         this._user = null;
-        this.unSubscrition.unsubscribe();
+        if (this.unSubscrition != undefined) {
+          this.unSubscrition.unsubscribe();
+        }
+
         this.store.dispatch(UnSetUser());
         this.store.dispatch(unSetItems());
       }
